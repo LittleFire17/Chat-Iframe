@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aiden's AI Chatbot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f4f4f4;
+        }
+        
+        /* Floating Chat Icon */
+        .chat-icon {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 30px;
+            cursor: pointer;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Chatbox UI */
+        .chatbox-container {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 350px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            display: none;
+            flex-direction: column;
+        }
+
+        .chatbox-header {
+            background: #007bff;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .chatbox-body {
+            height: 300px;
+            padding: 10px;
+            overflow-y: auto;
+            background: #f9f9f9;
+        }
+
+        .chatbox-footer {
+            display: flex;
+            border-top: 1px solid #ccc;
+            padding: 10px;
+            background: white;
+        }
+
+        .chatbox-footer input {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 4px;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .chatbox-footer button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            margin-left: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Chat Icon -->
+    <div class="chat-icon" onclick="toggleChat()">
+        💬
+    </div>
+
+    <!-- Chatbox UI -->
+    <div class="chatbox-container" id="chatbox">
+        <div class="chatbox-header">
+            Aiden's AI Chat
+        </div>
+        <div class="chatbox-body" id="chatBody">
+            <p><strong>AI:</strong> Hi there! Ask me anything. 😊</p>
+        </div>
+        <div class="chatbox-footer">
+            <input type="text" id="userInput" placeholder="Type your message...">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        function toggleChat() {
+            let chatbox = document.getElementById("chatbox");
+            chatbox.style.display = (chatbox.style.display === "none" || chatbox.style.display === "") ? "flex" : "none";
+        }
+
+        async function sendMessage() {
+            const userMessage = document.getElementById("userInput").value;
+            if (!userMessage) return;
+
+            const chatBody = document.getElementById("chatBody");
+            chatBody.innerHTML += `<p><strong>You:</strong> ${userMessage}</p>`;
+
+            const response = await fetch("https://api.openai.com/v1/chat/completions", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer YOUR_OPENAI_API_KEY"
+                },
+                body: JSON.stringify({
+                    model: "gpt-4",
+                    messages: [
+                        { "role": "system", "content": "You are a child-friendly AI chatbot for a 7-year-old. Keep responses fun, educational, and simple." },
+                        { "role": "user", "content": userMessage }
+                    ]
+                })
+            });
+
+            const jsonResponse = await response.json();
+            chatBody.innerHTML += `<p><strong>AI:</strong> ${jsonResponse.choices[0].message.content}</p>`;
+
+            document.getElementById("userInput").value = "";
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+    </script>
+
+</body>
+</html>
